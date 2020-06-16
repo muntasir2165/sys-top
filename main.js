@@ -1,8 +1,9 @@
 const path = require('path');
-const { app, Menu, ipcMain, Tray } = require('electron');
-const log = require('electron-log');
+const { app, Menu, ipcMain } = require('electron');
 const Store = require('./Store');
 const MainWindow = require('./MainWindow');
+const AppTray = require('./AppTray');
+
 // Set env
 process.env.NODE_ENV = 'development';
 // process.env.NODE_ENV = 'production';
@@ -47,34 +48,20 @@ app.on('ready', () => {
     return true;
   });
 
+  /**
+   * Reference: https://www.udemy.com/course/electron-from-scratch/learn/lecture/19823966#questions/11201583
+   * We do not want to use computer resources when there is no need and we want to free the memory allocated for the mainWindow when we close it.
+
+  The closed event is emitted when the window is closed.
+
+  After you have received this event you should remove the reference to the window and avoid using it any more.
+   */
+  mainWindow.on('closed', () => (mainWindow = null));
+
   const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png');
 
   // Create tray
-  tray = new Tray(icon);
-
-  tray.on('click', () => {
-    if (mainWindow.isVisible() === true) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
-  });
-
-  tray.on('right-click', () => {
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: 'Quit',
-        click: () => {
-          app.isQuitting = true;
-          app.quit();
-        },
-      },
-    ]);
-
-    tray.popUpContextMenu(contextMenu);
-  });
-
-  // mainWindow.on('ready', () => (mainWindow = null));
+  tray = new AppTray(icon, mainWindow);
 });
 
 const menu = [
