@@ -55,6 +55,15 @@ app.on('ready', () => {
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
 
+  mainWindow.on('close', (e) => {
+    if (!app.isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+
+    return true;
+  });
+
   const icon = path.join(__dirname, 'assets', 'icons', 'tray_icon.png');
 
   // Create tray
@@ -68,7 +77,21 @@ app.on('ready', () => {
     }
   });
 
-  mainWindow.on('ready', () => (mainWindow = null));
+  tray.on('right-click', () => {
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Quit',
+        click: () => {
+          app.isQuitting = true;
+          app.quit();
+        },
+      },
+    ]);
+
+    tray.popUpContextMenu(contextMenu);
+  });
+
+  // mainWindow.on('ready', () => (mainWindow = null));
 });
 
 const menu = [
