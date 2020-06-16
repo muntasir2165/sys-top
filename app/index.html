@@ -75,6 +75,7 @@
     <script>
       // const { ipcRenderer } = require('electron'); // No need to declare ipcRenderer here since it's already being declared in js/monitor.js; therefore, declaring ipcRenderer here throws error
       const settingsForm = document.getElementById('settings-form');
+      const nav = document.getElementById('nav');
 
       // Get settings
       ipcRenderer.on('settings:get', (e, settings) => {
@@ -107,6 +108,9 @@
 
         setTimeout(() => alert.classList.add('hide'), 3000);
       }
+
+      // Toggle nav
+      ipcRenderer.on('nav:toggle', () => nav.classList.toggle('hide'));
     </script>
   </body>
 </html>
